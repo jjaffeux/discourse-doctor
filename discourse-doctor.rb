@@ -53,7 +53,7 @@ end
 def grep_logs
   info("Search logs for errors...")
 
-  system("grep -E \"error|warning\" /var/www/discourse/log/production.log | sort | uniq -c | sort -r")
+  system("grep -E -w \"error|warning\" /var/www/discourse/log/production.log | sort | uniq -c | sort -r")
 end
 
 def check_hostname
