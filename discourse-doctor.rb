@@ -1,15 +1,17 @@
 #!/usr/bin/env ruby
 
-Dir.chdir("/")
-require 'bundler/inline'
-require 'net/http'
-require 'net/smtp'
-gemfile(true) do
-  source 'https://rubygems.org'
-  gem 'dnsruby'
-  gem 'paint'
+Dir.chdir("/") do
+  require 'bundler/inline'
+  require 'net/http'
+  require 'net/smtp'
+
+  gemfile(true, ui: false) do
+    source 'https://rubygems.org'
+
+    gem 'dnsruby'
+    gem 'paint'
+  end
 end
-Dir.chdir("/var/www/discourse")
 
 def log(level, message)
   $stderr.puts("#{level} #{message}")
