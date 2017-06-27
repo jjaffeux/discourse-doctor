@@ -11,10 +11,10 @@ very alpha quality software.
 ssh -i YOUR_KEY root@MACHINE_IP
 cd /var/discourse
 ./launcher enter app
-ruby -e "$(curl -fsSL https://gist.githubusercontent.com/jjaffeux/fe1387812fa6c015ebe5d59909b018bd/raw/discourse-doctor.rb)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/jjaffeux/discourse-doctor/master/discourse-doctor.rb)"
 ```
 
 
 ## Contribute
 
-Feel free to open a PR or come discuss it on meta.discourse.org.
+Feel free to open a PR or come discuss it on https://meta.discourse.org/t/discourse-doctor/65169.
