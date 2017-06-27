@@ -4,7 +4,6 @@ Dir.chdir("/")
 require 'bundler/inline'
 require 'net/http'
 require 'net/smtp'
-require 'open-uri'
 gemfile(true) do
   source 'https://rubygems.org'
   gem 'dnsruby'
@@ -78,8 +77,10 @@ def check_hostname
     error("Non-existent Internet Domain Names Definition (NXDOMAIN) for: #{ENV["DISCOURSE_HOSTNAME"]}")
   end
 
-  request = open("http://downforeveryoneorjustme.com/#{ENV["DISCOURSE_HOSTNAME"]}")
-  unless request.status == ["200", "OK"]
+  url = URI.parse("http://downforeveryoneorjustme.com/#{ENV["DISCOURSE_HOSTNAME"]}")
+  request = Net::HTTP.new(url.host, url.port)
+  result = request.request_get(url.path)
+  if result.body.include?("It's not just you")
     error("The internets can’t reach: #{ENV["DISCOURSE_HOSTNAME"]}")
   end
 end
