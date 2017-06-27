@@ -100,10 +100,10 @@ def check_plugins
     plugins = Dir.glob('*') - base_plugins
     plugins.each do |plugin|
       url = URI.parse("https://github.com/discourse/#{plugin}")
-      req = Net::HTTP.new(url.host, url.port)
-      req.use_ssl = true
-      res = req.request_head(url.path)
-      if res.code == "404"
+      request = Net::HTTP.new(url.host, url.port)
+      request.use_ssl = true
+      result = request.request_head(url.path)
+      if result.code == "404"
         unofficial_plugins << plugin
       end
     end
