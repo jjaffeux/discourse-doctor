@@ -2,6 +2,7 @@
 
 Dir.chdir("/")
 require 'bundler/inline'
+require 'net/http'
 require 'net/smtp'
 require 'open-uri'
 gemfile(true) do
@@ -83,6 +84,36 @@ def check_hostname
   end
 end
 
+def check_plugins
+  unofficial_plugins = []
+
+  base_plugins = %w(
+    discourse-details
+    discourse-narrative-bot
+    discourse-nginx-performance-report
+    lazyYT
+    poll
+  )
+
+  Dir.chdir("plugins") do
+    plugins = Dir.glob('*') - base_plugins
+    plugins.each do |plugin|
+      url = URI.parse("https://github.com/discourse/#{plugin}")
+      req = Net::HTTP.new(url.host, url.port)
+      req.use_ssl = true
+      res = req.request_head(url.path)
+      if res.code == "404"
+        unofficial_plugins << plugin
+      end
+    end
+  end
+
+  unless unofficial_plugins.empty?
+    warning("If you encounter issues, you might want to consider disabling these unofficial plugins: #{unofficial_plugins.join(',')}")
+  end
+end
+
 check_smtp_config
 check_hostname
+check_plugins
 grep_logs
