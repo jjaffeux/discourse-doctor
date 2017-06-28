@@ -1,17 +1,25 @@
 #!/usr/bin/env ruby
+# coding: utf-8
 
 Dir.chdir("/") do
   require 'bundler/inline'
   require 'net/http'
   require 'net/smtp'
+  require 'pathname'
 
   gemfile(true, ui: false) do
     source 'https://rubygems.org'
 
     gem 'dnsruby'
     gem 'paint'
+    gem 'sys-filesystem' # for checking available disk space
   end
+
+  require 'sys/filesystem'
+  include Sys
 end
+
+DISCOURSE_PATH = Pathname.new("/var/www/discourse")
 
 def log(level, message)
   $stderr.puts("#{level} #{message}")
@@ -55,7 +63,7 @@ end
 def grep_logs
   info("Search logs for errors...")
 
-  system("grep -E -w \"error|warning\" /var/www/discourse/log/production.log | sort | uniq -c | sort -r")
+  system("grep -E -w \"error|warning\" #{DISCOURSE_PATH.join("log/production.log")} | sort | uniq -c | sort -r")
 end
 
 def check_hostname
@@ -116,7 +124,16 @@ def check_plugins
   end
 end
 
+def check_available_disk_space
+  stat = Filesystem.stat(DISCOURSE_PATH.to_s)
+  bytes_available = stat.blocks_available * stat.block_size
+  if bytes_available < 10 * 1024
+    warning("The available disk space at #{DISCOURSE_PATH} is less than 10MB")
+  end
+end
+
 check_smtp_config
 check_hostname
 check_plugins
+check_available_disk_space
 grep_logs
